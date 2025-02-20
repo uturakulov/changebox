@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+    # Nginx Service
+    nginx:
+        image: nginx:latest
+        container_name: changebox-nginx
+        ports:
+            - "8080:80"
+        volumes:
+            - ./app:/var/www/html
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - php
+            - mysql
+        networks:
+            - app_network
+
+    # PHP-FPM Service
+    php:
+        build:
+            context: .
+            dockerfile: docker/php/Dockerfile
+        container_name: changebox-php-fpm
+        volumes:
+            - .:/var/www/html
+        environment:
+            APP_ENV: testing
+        networks:
+            - app_network
+
+    # MySQL Service
+    mysql:
+        image: mysql:8.0
+        container_name: changebox-mysql
+        restart: always
+        ports:
+            - "3307:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: laravel_db
+            MYSQL_USER: laravel_user
+            MYSQL_PASSWORD: laravel_password
+        volumes:
+            - mysql_data:/var/lib/mysql
+            - ./docker/mysql/init:/docker-entrypoint-initdb.d
+        networks:
+            - app_network
+        healthcheck:
+            test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+            interval: 10s
+            retries: 3
+            start_period: 10s
+
+networks:
+    app_network:
+        driver: bridge
+
+volumes:
+    mysql_data:
