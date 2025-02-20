@@ -30,3 +30,9 @@ docker exec -it changebox-php-fpm php artisan migrate
 ```bash
 docker exec -it changebox-php-fpm php artisan test
 ```
+
+## Swagger Docs
+
+```bash
+/api/documentation
+```
