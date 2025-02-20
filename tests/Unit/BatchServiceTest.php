@@ -30,7 +30,7 @@ class BatchServiceTest extends TestCase
 
         $this->assertDatabaseHas('batches', ['status' => 'pending']);
 
-        $batch = Batch::first();
+        $batch = Batch::query()->first();
 
         $this->assertDatabaseHas('transactions', [
             'batch_id' => $batch->id,

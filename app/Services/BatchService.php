@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Queue;
 
 class BatchService
 {
-    public static function createBatches(): void
+    public static function createBatches(?int $batchSize = null): void
     {
-        DB::transaction(function () {
-            $batchSize = SettingsService::getBatchSize();
+        DB::transaction(function () use ($batchSize) {
+            if ($batchSize === null) {
+                $batchSize = SettingsService::getBatchSize();
+            }
 
             // Получаем транзакции по размеру батча
             $transactions = Transaction::query()
